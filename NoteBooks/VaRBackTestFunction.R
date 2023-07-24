@@ -1,4 +1,5 @@
-VaRBackTest <- function(path, df, ShapeSave = FALSE, windowlen = 104, maxDataPoints = 1000){
+VaRBackTest <- function(path, df, ShapeSave = FALSE, windowlen = 104, maxDataPoints = 1000, returndays = 1, confidencelevel = 0.99, exportdata=FALSE, expath){
+# returndays = 1 for day to day, 2 for 5 days, 3 for 10 days, 4 for 20 days, 5 for 40 days
 options(warn=-1)
 library(lmomco)
 library(FRAPO)
@@ -18,13 +19,13 @@ yret <- na.omit(diff(log(y))*100)
 rd <- c(1, 5, 10, 20, 40)
 yrets <- na.omit(matrix(unlist(lapply(rd, function(x) diff(log(y),
                                                            lag = x))), ncol = 5))
-Idx <- yrets[,2]
+Idx <- yrets[,returndays]
 L <- -100 * Idx
 
 ## Computing VaR ( Normal & GLD ) 99%, moving window
 ep <- windowlen:length(L)
 sp <- 1:length(ep)
-level <- 0.99
+level <- confidencelevel
 
 VaR <- matrix(NA, ncol = 2, nrow = length(ep))
 for(i in 1:length(sp)){
@@ -38,7 +39,10 @@ for(i in 1:length(sp)){
 ## Summarising results
 Res <-  cbind(L[windowlen+1:length(L)], VaR[-nrow(VaR), ])
 colnames(Res) <- c("Loss", "VaRGld", "VaRNor")
-  
+if (exportdata == TRUE){
+  ex = cbind(Vniki$J.Date[(dim(Vniki)[1]-dim(Res)[1]+1):(dim(Vniki)[1])],Vniki$Date[(dim(Vniki)[1]-dim(Res)[1]+1):(dim(Vniki)[1])],Res)
+  write.csv(ex, expath)
+}  
   ## Plot of backtest results
 if (ShapeSave == TRUE){  jpeg(paste(Vniki[1,5],"_VaRBackTest.jpeg", sep = ''), )
 plot(Res[,"Loss"], type = "p", xlab = paste("Time Index_", df, sep = ''),

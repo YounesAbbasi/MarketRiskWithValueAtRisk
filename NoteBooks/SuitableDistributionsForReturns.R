@@ -2,7 +2,8 @@ source("VaRESFunction.R")
 source('ShapeTriangleFunction.R')
 source('VaRBackTestFunction.R')
 #########----------------Import Data-------------#########
-path = 'D:/R_project/MarketRiskModeling/Raw/AdjPrice/'
+#path = 'D:/R_project/MarketRiskModeling/Raw/AdjPrice/'
+path = 'D:/R_project/MarketRiskModeling/Raw/OverallIndex/'
 dfList = list.files(path, pattern = '*.csv')
 
 #########-----------Fitting Stock returns to the GHD --------#############
@@ -16,7 +17,7 @@ for (df in dfList[1:1]){
 ShapeTriangle(path=path, df = dfList[1])
 
 #########----------------Fitting QCOM returns to the GLD-------------#########
-VaRBackTest(path = path, df = dfList[1], ShapeSave = TRUE, maxDataPoints=300)
+VaRBackTest(path = path, df = dfList[1], ShapeSave = TRUE, maxDataPoints=1500, returndays = 1, confidencelevel = 0.95, exportdata=TRUE, expath='D:/R_project/MarketRiskModeling/Raw/OverallIndex/OverallInx.csv')
 
 ########----- FTSE 100 stocks: shape triangle of standardized GLD-----########
 #### This part is for some stocks not one stock
